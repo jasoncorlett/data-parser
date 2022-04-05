@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define MAX_DECIMALS 10
+#define MAX_DECIMALS 15
 #define NUMBER_FORMAT "%.*lf"
 char* double_to_string(double d) {
     char* str = NULL;
