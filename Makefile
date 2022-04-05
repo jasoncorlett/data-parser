@@ -20,7 +20,7 @@ run: build
 	./$(EXE) '$(JSON)'
 
 debug: clean build
-	valgrind ./$(EXE) '$(JSON)'
+	valgrind --leak-check=full --track-origins=yes ./$(EXE) '$(JSON)'
 
 test: build
 	prove -v

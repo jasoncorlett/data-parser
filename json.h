@@ -54,4 +54,6 @@ json_node json_create_number(double d);
 json_node json_create_string(char *str);
 json_node json_create_error(char *str);
 
+void json_free_node(json_node node);
+
 void string_append(char**, char*);

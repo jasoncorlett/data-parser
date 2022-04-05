@@ -147,11 +147,14 @@ void print_token_list(token *t) {
     }
 }
 
-void free_token_list(token *list) { // FIXME: Memory leak
-    // if (list == NULL) return;
-    // if (list->next != NULL)
-    //     free_token_list(list->next);
-    // free(list);
+void free_token_list(token **list) {
+    if ((*list)->next != NULL) {
+        free_token_list(&((*list)->next));
+    }
+    if (((*list)->type == TOKEN_STRING || ((*list)->type == TOKEN_ERROR)) && (*list)->value.string != NULL) {
+        free((*list)->value.string);
+    }
+    free(*list);
 }
 
 token *tokenize(char *input) {
@@ -196,7 +199,7 @@ token *tokenize(char *input) {
         }
         case '\r': case '\n': case ' ': ++input; continue;
         default: {
-            free_token_list(list);
+            free_token_list(&list);
             #define MSG "Invalid character at "
             #define LEN (sizeof(MSG) + 3)
             char *str = malloc(LEN);
@@ -336,5 +339,7 @@ json_node parse_next_token(token *token) {
 
 json_node json_parse(char *input) {
     token *token = tokenize(input);
-    return parse_next_token(token);
+    json_node node = parse_next_token(token);
+    free_token_list(&token);
+    return node;
 }

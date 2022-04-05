@@ -37,12 +37,18 @@ char* double_to_string(double d) {
     return str;
 }
 
+char *new_string() {
+    char *str = malloc(1);
+    str[0] = '\0';
+    return str;
+}
+
 void string_append(char **str1, char *str2) {
     size_t len1 = strlen(*str1);
     size_t len2 = strlen(str2);
 
     *str1 = realloc(*str1, len1 + len2 + 1);
-    if (!*str1) {
+    if (*str1 == NULL) {
         fprintf(stderr, "Could not append to string!");
         exit(1);
     }
@@ -51,11 +57,11 @@ void string_append(char **str1, char *str2) {
 }
 
 char *quote(char *str) {
-    size_t length = strlen(str);
-    char *quoted = calloc(length + 3, sizeof(char));
-    strncat(quoted, "\"", 2);
-    strncat(quoted, str, length);
-    strncat(quoted, "\"", 2);
+    if (str == NULL) return NULL;
+    char *quoted = new_string();
+    string_append(&quoted, "\"");
+    string_append(&quoted, str);
+    string_append(&quoted, "\"");
     return quoted;
 }
 
@@ -65,14 +71,21 @@ void string_indent(char **str, char *pad, int count) {
     }
 }
 
+char *heap_string(char *str) {
+    size_t len = strlen(str) + 1;
+    char *heap = malloc(len);
+    strncpy(heap, str, len);
+    return heap;
+}
+
 char *json_node_to_string_internal(json_node node, char *pad, int indent) {
     bool pretty = pad != NULL;
-
+    
     switch (node.type) {
-    case JSON_NULL:    return "null";
+    case JSON_NULL:    return heap_string("null");
     case JSON_STRING:  return quote(node.as.string);
-    case JSON_BOOLEAN: return node.as.boolean ? "true" : "false";
-    case JSON_NUMBER:  return double_to_string(node.as.number); // FIXME: Null result?
+    case JSON_BOOLEAN: return heap_string(node.as.boolean ? "true" : "false");
+    case JSON_NUMBER:  return heap_string(double_to_string(node.as.number)); // FIXME: Null result?
     case JSON_ERROR: {
         char *str = malloc(1);
         str[0] = '\0';
@@ -152,11 +165,15 @@ char *json_node_to_pretty_string(json_node node) {
 }
 
 void json_print_node(json_node node) {
-    printf("%s\n", json_node_to_string(node));
+    char *str = json_node_to_string(node);
+    printf("%s\n", str);
+    free(str);
 }
 
 void json_pretty_print_node(json_node node) {
-    printf("%s\n", json_node_to_pretty_string(node));
+    char *str = json_node_to_pretty_string(node);
+    printf("%s\n", str);
+    free(str);
 }
 
 char* json_node_type_name(json_node node) {
@@ -176,7 +193,10 @@ json_node json_create_number(double d) {
 }
 
 json_node json_create_string(char *str) {
-    return (json_node){ .type = JSON_STRING, .as.string = str };
+    size_t len = strlen(str);
+    char *t = malloc(len + 1);
+    strncpy(t, str, len + 1);
+    return (json_node){ .type = JSON_STRING, .as.string = t };
 }
 
 json_node json_create_error(char *msg) {
@@ -234,3 +254,14 @@ bool json_object_get(json_node node, char *key, json_node *value) {
     }
     return false;
 }
+
+// TODO: Array and objects
+void json_free_node(json_node node) {
+    switch (node.type) {
+        case JSON_STRING:
+        case JSON_ERROR:
+            free(node.as.string);
+            break;
+        default:
+            break;
+    }}

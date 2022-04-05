@@ -15,4 +15,5 @@ int main(int argc, char **argv) {
     }
 
     json_print_node(json);
+    json_free_node(json);
 }
