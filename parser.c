@@ -6,6 +6,7 @@
 
 #include "json.h"
 #include "parser.h"
+#include "util.h"
 
 double tokenize_number(char **input) {
     double result = 0;

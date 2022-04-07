@@ -35,8 +35,6 @@ struct json_node {
     } as;
 };
 
-char* double_to_string(double d);
-
 char *json_node_to_string(json_node node);
 char *json_node_type_name(json_node node);
 void json_print_node(json_node node);
@@ -55,5 +53,3 @@ json_node json_create_string(char *str);
 json_node json_create_error(char *str);
 
 void json_free_node(json_node node);
-
-void string_append(char**, char*);
