@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include "parser.h"
 #include "node.h"
 #include "json.h"
 
@@ -9,13 +8,13 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    Node json = json_parse(argv[1]);
+    Node node = json_parse(argv[1]);
 
-    if (json.type == NODE_TYPE_ERROR) {
-        fprintf(stderr, "ERROR: %s\n", json.as.string);
+    if (node.type == NODE_TYPE_ERROR) {
+        fprintf(stderr, "ERROR: %s\n", node.as.string);
         return 1;
     }
 
-    json_print_node(json);
-    node_free(json);
+    json_print_node(node);
+    node_free(node);
 }
