@@ -10,10 +10,10 @@ char *json_node_to_string_internal(json_node node, char *pad, int indent) {
     bool pretty = pad != NULL;
     
     switch (node.type) {
-    case JSON_NULL:    return create_heap_string("null");
+    case JSON_NULL:    return copy_to_heap_string("null");
     case JSON_STRING:  return string_quote(node.as.string);
-    case JSON_BOOLEAN: return create_heap_string(node.as.boolean ? "true" : "false");
-    case JSON_NUMBER:  return create_heap_string(double_to_string(node.as.number)); // FIXME: Null result?
+    case JSON_BOOLEAN: return copy_to_heap_string(node.as.boolean ? "true" : "false");
+    case JSON_NUMBER:  return copy_to_heap_string(double_to_string(node.as.number)); // FIXME: Null result?
     case JSON_ERROR: {
         char *str = malloc(1);
         str[0] = '\0';

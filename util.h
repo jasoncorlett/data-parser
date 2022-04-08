@@ -1,7 +1,7 @@
 #ifndef UTIL_H
 #define UTIL_H 1
 
-char *create_heap_string();
+char *create_heap_string(void);
 char *copy_to_heap_string(char *str);
 
 char *string_quote(char *str);

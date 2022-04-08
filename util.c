@@ -37,7 +37,7 @@ char *double_to_string(double d) {
     return str;
 }
 
-char *create_heap_string() {
+char *create_heap_string(void) {
     char *str = malloc(1);
     str[0] = '\0';
     return str;
