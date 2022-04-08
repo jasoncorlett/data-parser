@@ -4,18 +4,17 @@
 #include <stdbool.h>
 
 #include "util.h"
-#include "enum.h"
 #include "node.h"
 
-char *json_node_to_string_internal(json_node node, char *pad, int indent) {
+char *json_node_to_string_internal(Node node, char *pad, int indent) {
     bool pretty = pad != NULL;
     
     switch (node.type) {
-    case JSON_NULL:    return copy_to_heap_string("null");
-    case JSON_STRING:  return string_quote(node.as.string);
-    case JSON_BOOLEAN: return copy_to_heap_string(node.as.boolean ? "true" : "false");
-    case JSON_NUMBER:  return copy_to_heap_string(double_to_string(node.as.number)); // FIXME: Null result?
-    case JSON_ERROR: {
+    case NODE_TYPE_NULL:    return copy_to_heap_string("null");
+    case NODE_TYPE_STRING:  return string_quote(node.as.string);
+    case NODE_TYPE_BOOLEAN: return copy_to_heap_string(node.as.boolean ? "true" : "false");
+    case NODE_TYPE_NUMBER:  return copy_to_heap_string(double_to_string(node.as.number)); // FIXME: Null result?
+    case NODE_TYPE_ERROR: {
         char *str = malloc(1);
         str[0] = '\0';
         string_append(&str, "[ERROR] ");
@@ -24,7 +23,7 @@ char *json_node_to_string_internal(json_node node, char *pad, int indent) {
         }
         return str;
     }
-    case JSON_ARRAY: {
+    case NODE_TYPE_ARRAY: {
         char *str = malloc(1);
         str[0] = '\0';
         string_append(&str, "[");
@@ -54,7 +53,7 @@ char *json_node_to_string_internal(json_node node, char *pad, int indent) {
         string_append(&str, "]");
         return str;
     }
-    case JSON_OBJECT: {
+    case NODE_TYPE_MAP: {
         char *str = malloc(1);
         str[0] = '\0';
 
@@ -62,15 +61,15 @@ char *json_node_to_string_internal(json_node node, char *pad, int indent) {
         indent++;
         if (pretty) string_append(&str, "\n");
         
-        for (size_t i = 0; i < node.as.object->length; i++) {
+        for (size_t i = 0; i < node.as.map->length; i++) {
             if (i > 0) {
                 string_append(&str, ",");
                 if (pretty) string_append(&str, "\n");
             }
             if (pretty) string_indent(&str, pad, indent);
-            string_append(&str, string_quote(node.as.object->entries[i].key));
+            string_append(&str, string_quote(node.as.map->entries[i].key));
             string_append(&str, ":");
-            string_append(&str, json_node_to_string_internal(*node.as.object->entries[i].value, pad, indent));
+            string_append(&str, json_node_to_string_internal(*node.as.map->entries[i].value, pad, indent));
         }
 
         if (pretty) {
@@ -85,26 +84,23 @@ char *json_node_to_string_internal(json_node node, char *pad, int indent) {
     return NULL;
 }
 
-char *json_node_to_string(json_node node) {
+char *json_node_to_string(Node node) {
     return json_node_to_string_internal(node, NULL, 0);
 }
 
-char *json_node_to_pretty_string(json_node node) {
+char *json_node_to_pretty_string(Node node) {
     return json_node_to_string_internal(node, "  ", 0);
 }
 
-void json_print_node(json_node node) {
+void json_print_node(Node node) {
     char *str = json_node_to_string(node);
     printf("%s\n", str);
     free(str);
 }
 
-void json_pretty_print_node(json_node node) {
+void json_pretty_print_node(Node node) {
     char *str = json_node_to_pretty_string(node);
     printf("%s\n", str);
     free(str);
 }
 
-char* json_node_type_name(json_node node) {
-    return json_type_name(node.type);
-}

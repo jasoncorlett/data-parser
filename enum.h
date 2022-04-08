@@ -18,16 +18,3 @@ typedef enum {
 } token_type;
 
 char *token_type_name(token_type val);
-
-typedef enum {
-	JSON_ERROR = -1,
-	JSON_NULL,
-	JSON_STRING,
-	JSON_BOOLEAN,
-	JSON_NUMBER,
-	JSON_ARRAY,
-	JSON_OBJECT,
-} json_type;
-
-char *json_type_name(json_type val);
-

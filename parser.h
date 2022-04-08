@@ -1,6 +1,5 @@
 #pragma once
 
-#include "enum.h"
-#include "json.h"
+#include "node.h"
 
-json_node json_parse(char *input);
+Node json_parse(char *input);

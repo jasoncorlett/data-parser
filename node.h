@@ -1,55 +1,63 @@
-#pragma once
+#ifndef NODE_H
+#define NODE_H 1
 
 #include <stddef.h>
 #include <stdbool.h>
-#include "enum.h"
+typedef enum {
+	NODE_TYPE_ERROR = -1,
+	NODE_TYPE_NULL,
+	NODE_TYPE_STRING,
+	NODE_TYPE_BOOLEAN,
+	NODE_TYPE_NUMBER,
+	NODE_TYPE_ARRAY,
+	NODE_TYPE_MAP,
+} NodeType;
 
-typedef struct json_node            json_node;
-typedef struct json_array           json_array;
-typedef struct json_object_entry    json_object_entry;
-typedef struct json_object          json_object;
+typedef struct Node         Node;
+typedef struct NodeArray    NodeArray;
+typedef struct NodeMapEntry NodeMapEntry;
+typedef struct NodeMap      NodeMap;
 
-struct json_array {
+struct NodeArray {
     size_t length;
-    json_node *nodes;
+    Node *nodes;
 };
 
-struct json_object_entry {
+struct NodeMapEntry {
     char *key;
-    json_node *value;
+    Node *value;
 };
 
-struct json_object {
+struct NodeMap {
     size_t length;
-    json_object_entry *entries;
+    NodeMapEntry *entries;
 };
 
-struct json_node {
-    json_type type;
+struct Node {
+    NodeType type;
     union {
         char *string;
         char boolean;
         double number;
-        json_array *array;
-        json_object *object;
+        NodeArray *array;
+        NodeMap *map;
     } as;
 };
 
-char *json_node_to_string(json_node node);
-char *json_node_type_name(json_node node);
-void json_print_node(json_node node);
-void json_pretty_print_node(json_node node);
+char *node_type_name(NodeType type);
 
-json_node *json_create_array();
-void json_array_append(json_node array, json_node node);
+Node *node_create_array(void);
+void node_array_append(Node array, Node node);
 
-json_node *json_create_object();
-void json_object_set(json_node node, char *key, json_node value);
+Node *node_create_map(void);
+void node_map_set(Node map, char *key, Node node);
 
-json_node json_create_null();
-json_node json_create_boolean(bool b);
-json_node json_create_number(double d);
-json_node json_create_string(char *str);
-json_node json_create_error(char *str);
+Node node_create_null();
+Node node_create_boolean(bool b);
+Node node_create_number(double d);
+Node node_create_string(char *str);
+Node node_create_error(char *str);
 
-void json_free_node(json_node node);
+void node_free(Node node);
+
+#endif

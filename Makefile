@@ -1,17 +1,14 @@
-.PHONY: run clean gen scratch
+.PHONY: run clean debug scratch
 
 CFLAGS = -g -Wall -Wextra --pedantic
 JSON = "Hello, World!"
 OBJECTS = json.o parser.o enum.o util.o node.o
 EXE = echo
 
-build: clean gen $(EXE)
+build: clean $(EXE)
 	rm -f $(OBJECTS)
 
 $(EXE): $(OBJECTS)
-
-gen:
-	perl bin/gen-enum.pl
 
 clean:
 	rm -f $(OBJECTS) $(EXE)

@@ -7,6 +7,7 @@
 #include "json.h"
 #include "parser.h"
 #include "util.h"
+#include "node.h"
 
 double tokenize_number(char **input) {
     double result = 0;
@@ -214,9 +215,9 @@ token *tokenize(char *input) {
     return list;
 }
 
-json_node parse_next_token(token *token);
+Node parse_next_token(token *token);
 
-json_node parse_error(char *message, token at) {
+Node parse_error(char *message, token at) {
     char *str = malloc(1);
     str[0] = '\0';
     if (message != NULL) {
@@ -244,16 +245,16 @@ json_node parse_error(char *message, token at) {
         }
         string_append(&str, ")");
     }
-    return json_create_error(str);
+    return node_create_error(str);
 }
 
-json_node parse_array(token *token) {
-    json_node array = *json_create_array();
+Node parse_array(token *token) {
+    Node array = *node_create_array();
 
     token = token->next; // left bracket
     while (token != NULL && token->type != TOKEN_RIGHT_BRACKET) {
-        json_node node = parse_next_token(token);
-        json_array_append(array, node);
+        Node node = parse_next_token(token);
+        node_array_append(array, node);
         token = token->next;
 
         if (token != NULL && token->type == TOKEN_COMMA) {
@@ -264,15 +265,15 @@ json_node parse_array(token *token) {
         }
     }
 
-    if (token == NULL) return json_create_error("Expected ] at EOF");
-    if (token->type != TOKEN_RIGHT_BRACKET) return json_create_error("Expected ]");
+    if (token == NULL) return node_create_error("Expected ] at EOF");
+    if (token->type != TOKEN_RIGHT_BRACKET) return node_create_error("Expected ]");
     token = token->next; // right bracket
 
     return array;
 }
 
-json_node parse_object(token *token) {
-    json_node object = *json_create_object();
+Node parse_object(token *token) {
+    Node object = *node_create_map();
 
     token = token->next; // left brace
     
@@ -294,8 +295,8 @@ json_node parse_object(token *token) {
         if (token == NULL) {
             return parse_error("Expected object value", *token);
         }
-        json_node value = parse_next_token(token);
-        json_object_set(object, key, value);
+        Node value = parse_next_token(token);
+        node_map_set(object, key, value);
 
         token = token->next;
         if (token != NULL && token->type == TOKEN_COMMA) {
@@ -314,22 +315,22 @@ json_node parse_object(token *token) {
     return object;
 }
 
-json_node parse_next_token(token *token) {
+Node parse_next_token(token *token) {
     switch (token->type) {
     case TOKEN_LEFT_BRACE:
         return parse_object(token);
     case TOKEN_LEFT_BRACKET:
         return parse_array(token);
     case TOKEN_NUMBER:
-        return json_create_number(token->value.number);
+        return node_create_number(token->value.number);
     case TOKEN_STRING:
-        return json_create_string(token->value.string);
+        return node_create_string(token->value.string);
     case TOKEN_TRUE:
-        return json_create_boolean(true);
+        return node_create_boolean(true);
     case TOKEN_FALSE:
-        return json_create_boolean(false);
+        return node_create_boolean(false);
     case TOKEN_NULL:
-        return json_create_null();
+        return node_create_null();
     case TOKEN_ERROR:
         return parse_error(NULL, *token);
     default:
@@ -338,9 +339,9 @@ json_node parse_next_token(token *token) {
         
 }
 
-json_node json_parse(char *input) {
+Node json_parse(char *input) {
     token *token = tokenize(input);
-    json_node node = parse_next_token(token);
+    Node node = parse_next_token(token);
     free_token_list(&token);
     return node;
 }

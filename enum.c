@@ -19,16 +19,3 @@ char *token_type_name(token_type val) {
 	}
 }
 
-char *json_type_name(json_type val) {
-	switch (val) {
-	case JSON_ERROR: return "ERROR";
-	case JSON_NULL: return "NULL";
-	case JSON_STRING: return "STRING";
-	case JSON_BOOLEAN: return "BOOLEAN";
-	case JSON_NUMBER: return "NUMBER";
-	case JSON_ARRAY: return "ARRAY";
-	case JSON_OBJECT: return "OBJECT";
-	default: return "<UNKNOWN json_type>";
-	}
-}
-
