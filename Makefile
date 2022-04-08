@@ -2,7 +2,7 @@
 
 CFLAGS = -g -Wall -Wextra --pedantic
 JSON = "Hello, World!"
-OBJECTS = json.o parser.o enum.o util.o
+OBJECTS = json.o parser.o enum.o util.o node.o
 EXE = echo
 
 build: clean gen $(EXE)
