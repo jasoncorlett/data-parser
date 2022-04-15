@@ -184,6 +184,7 @@ void print_token_list(token *t) {
 }
 
 void free_token_list(token **list) {
+    if (list == NULL || *list == NULL) return;
     if ((*list)->next != NULL) {
         free_token_list(&((*list)->next));
     }
